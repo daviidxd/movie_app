@@ -22,7 +22,7 @@ void initializeMovies(MovieArray *list) { list->count = 0; }
 
 int addMovie(MovieArray *list) {
   if (list->count >= MAX_MOVIES) {
-    printf("Error: Maximum movie capacity reached.\n");
+    printf("Erro: Capacidade maxima de filmes atingida.\n");
     return 0;
   }
 
