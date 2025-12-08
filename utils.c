@@ -12,7 +12,7 @@ int readInteger(const char *prompt) {
     int value;
     printf("%s", prompt);
     while (scanf("%d", &value) != 1) {
-        printf("Invalid input. Please enter an integer: ");
+        printf("Entrada invalida. Por favor introduza um inteiro: ");
         clearInputBuffer();
     }
     clearInputBuffer();
@@ -23,7 +23,7 @@ float readFloat(const char *prompt) {
     float value;
     printf("%s", prompt);
     while (scanf("%f", &value) != 1) {
-        printf("Invalid input. Please enter a number: ");
+        printf("Entrada invalida. Por favor introduza um numero: ");
         clearInputBuffer();
     }
     clearInputBuffer();
@@ -35,7 +35,7 @@ int readIntegerRange(const char *prompt, int min, int max) {
     do {
         value = readInteger(prompt);
         if (value < min || value > max) {
-            printf("Value must be between %d and %d.\n", min, max);
+            printf("O valor deve estar entre %d e %d.\n", min, max);
         }
     } while (value < min || value > max);
     return value;
@@ -46,7 +46,7 @@ float readFloatRange(const char *prompt, float min, float max) {
     do {
         value = readFloat(prompt);
         if (value < min || value > max) {
-            printf("Value must be between %.1f and %.1f.\n", min, max);
+            printf("O valor deve estar entre %.1f e %.1f.\n", min, max);
         }
     } while (value < min || value > max);
     return value;
@@ -66,6 +66,6 @@ Genre selectGenre() {
     for (int i = 0; i < GENRE_COUNT; i++) {
         printf("%d. %s\n", i + 1, getGenreName((Genre)i));
     }
-    int choice = readIntegerRange("Enter genre number: ", 1, GENRE_COUNT);
+    int choice = readIntegerRange("Introduza o numero do genero: ", 1, GENRE_COUNT);
     return (Genre)(choice - 1);
 }

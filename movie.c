@@ -30,28 +30,28 @@ int addMovie(MovieArray *list) {
 
   m->code = (list->count == 0) ? 1 : list->movies[list->count - 1].code + 1;
 
-  readString("Enter Title: ", m->title, MAX_STRING);
+  readString("Introduza o Titulo: ", m->title, MAX_STRING);
 
   for (int i = 0; i < GENRE_COUNT; i++)
     m->genres[i] = 0;
-  printf("Add genres (enter 0 to stop):\n");
+  printf("Adicionar generos (introduza 0 para parar):\n");
   while (1) {
     Genre g = selectGenre();
     m->genres[g] = 1;
-    printf("Add another genre? (1: Yes, 0: No): ");
+    printf("Adicionar outro genero? (1: Sim, 0: Nao): ");
     int choice = readIntegerRange("", 0, 1);
     if (choice == 0)
       break;
   }
 
-  readString("Enter Description: ", m->description, MAX_DESCRIPTION);
-  readString("Enter Director: ", m->director, MAX_STRING);
+  readString("Introduza a Descricao: ", m->description, MAX_DESCRIPTION);
+  readString("Introduza o Realizador: ", m->director, MAX_STRING);
 
   m->actorsCount = 0;
-  printf("Add actors (enter empty name to stop):\n");
+  printf("Adicionar atores (introduza nome vazio para parar):\n");
   while (m->actorsCount < MAX_ACTORS) {
     char actorName[MAX_STRING];
-    printf("Actor %d: ", m->actorsCount + 1);
+    printf("Ator %d: ", m->actorsCount + 1);
     readString("", actorName, MAX_STRING);
     if (strlen(actorName) == 0)
       break;
@@ -59,14 +59,14 @@ int addMovie(MovieArray *list) {
     m->actorsCount++;
   }
 
-  m->year = readIntegerRange("Enter Year: ", 1888, 2100);
-  m->duration = readIntegerRange("Enter Duration (minutes): ", 1, 1000);
-  m->rating = readFloatRange("Enter Rating (0-10): ", 0.0, 10.0);
-  m->favorite = readIntegerRange("Enter Favorites count: ", 0, 1000000000);
-  m->revenue = readFloatRange("Enter Revenue (millions): ", 0.0, 10000.0);
+  m->year = readIntegerRange("Introduza o Ano: ", 1888, 2100);
+  m->duration = readIntegerRange("Introduza a Duracao (minutos): ", 1, 1000);
+  m->rating = readFloatRange("Introduza a Classificacao (0-10): ", 0.0, 10.0);
+  m->favorite = readIntegerRange("Introduza o numero de Favoritos: ", 0, 1000000000);
+  m->revenue = readFloatRange("Introduza a Receita (milhoes): ", 0.0, 10000.0);
 
   list->count++;
-  printf("Movie added successfully with Code: %d\n", m->code);
+  printf("Filme adicionado com sucesso com o Codigo: %d\n", m->code);
   return 1;
 }
 
@@ -181,21 +181,21 @@ void consultMovie(const MovieArray *list, int code) {
   for (int i = 0; i < list->count; i++) {
     if (list->movies[i].code == code) {
       Movie m = list->movies[i];
-      printf("Code: %d\n", m.code);
-      printf("Title: %s\n", m.title);
-      printf("Director: %s\n", m.director);
-      printf("Year: %d\n", m.year);
-      printf("Duration: %d min\n", m.duration);
-      printf("Rating: %.1f\n", m.rating);
-      printf("Favorites: %d\n", m.favorite);
-      printf("Revenue: %.2fM\n", m.revenue);
-      printf("Description: %s\n", m.description);
-      printf("Genres: ");
+      printf("Codigo: %d\n", m.code);
+      printf("Titulo: %s\n", m.title);
+      printf("Realizador: %s\n", m.director);
+      printf("Ano: %d\n", m.year);
+      printf("Duracao: %d min\n", m.duration);
+      printf("Classificacao: %.1f\n", m.rating);
+      printf("Favoritos: %d\n", m.favorite);
+      printf("Receita: %.2fM\n", m.revenue);
+      printf("Descricao: %s\n", m.description);
+      printf("Generos: ");
       for (int g = 0; g < GENRE_COUNT; g++) {
         if (m.genres[g])
           printf("%s ", getGenreName((Genre)g));
       }
-      printf("\nActors: ");
+      printf("\nAtores: ");
       for (int a = 0; a < m.actorsCount; a++) {
         printf("%s", m.actors[a]);
         if (a < m.actorsCount - 1)
@@ -204,5 +204,5 @@ void consultMovie(const MovieArray *list, int code) {
       return;
     }
   }
-  printf("Movie with code %d not found.\n", code);
+  printf("Filme com o codigo %d nao encontrado.\n", code);
 }

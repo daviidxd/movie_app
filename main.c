@@ -4,26 +4,26 @@
 #include "utils.h"
 
 void printMenu() {
-    printf("1. List Movies\n");
-    printf("2. Search Movies\n");
-    printf("3. Consult Movie Details\n");
-    printf("4. Add Movie\n");
-    printf("0. Exit\n");
+    printf("1. Listar Filmes\n");
+    printf("2. Pesquisar Filmes\n");
+    printf("3. Consultar Detalhes do Filme\n");
+    printf("4. Adicionar Filme\n");
+    printf("0. Sair\n");
 }
 
 void printListMenu() {
-    printf("1. By Code (Ascending)\n");
-    printf("2. By Rating (Descending)\n");
-    printf("3. By Title (Alphabetical)\n");
-    printf("0. Back\n");
+    printf("1. Por Código (Crescente)\n");
+    printf("2. Por Classificação (Decrescente)\n");
+    printf("3. Por Título (Alfabético)\n");
+    printf("0. Voltar\n");
 }
 
 void printSearchMenu() {
-    printf("1. By Title\n");
-    printf("2. By Genre\n");
-    printf("3. By Director\n");
-    printf("4. By Actor\n");
-    printf("0. Back\n");
+    printf("1. Por Título\n");
+    printf("2. Por Género\n");
+    printf("3. Por Realizador\n");
+    printf("4. Por Ator\n");
+    printf("0. Voltar\n");
 }
 
 int main() {
@@ -33,20 +33,20 @@ int main() {
     int choice;
     do {
         printMenu();
-        choice = readInteger("Select an option: ");
+        choice = readInteger("Selecione uma opção: ");
 
         switch (choice) {
             case 1: {
                 int listChoice;
                 do {
                     printListMenu();
-                    listChoice = readInteger("Select list option: ");
+                    listChoice = readInteger("Selecione uma opção de listagem: ");
                     switch (listChoice) {
                         case 1: listMoviesByCode(&movieData); break;
                         case 2: listMoviesByRating(&movieData); break;
                         case 3: listMoviesByTitle(&movieData); break;
                         case 0: break;
-                        default: printf("Invalid option.\n");
+                        default: printf("Opção inválida.\n");
                     }
                 } while (listChoice != 0);
                 break;
@@ -55,11 +55,11 @@ int main() {
                 int searchChoice;
                 do {
                     printSearchMenu();
-                    searchChoice = readInteger("Select search option: ");
+                    searchChoice = readInteger("Selecione uma opção de pesquisa: ");
                     switch (searchChoice) {
                         case 1: {
                             char search[MAX_STRING];
-                            readString("Enter title to search: ", search, MAX_STRING);
+                            readString("Introduza o título para pesquisar: ", search, MAX_STRING);
                             searchMoviesByTitle(&movieData, search);
                             break;
                         }
@@ -70,24 +70,24 @@ int main() {
                         }
                         case 3: {
                             char director[MAX_STRING];
-                            readString("Enter director name: ", director, MAX_STRING);
+                            readString("Introduza o nome do realizador: ", director, MAX_STRING);
                             searchMoviesByDirector(&movieData, director);
                             break;
                         }
                         case 4: {
                             char actor[MAX_STRING];
-                            readString("Enter actor name: ", actor, MAX_STRING);
+                            readString("Introduza o nome do ator: ", actor, MAX_STRING);
                             searchMoviesByActor(&movieData, actor);
                             break;
                         }
                         case 0: break;
-                        default: printf("Invalid option.\n");
+                        default: printf("Opção inválida.\n");
                     }
                 } while (searchChoice != 0);
                 break;
             }
             case 3: {
-                int code = readInteger("Enter Movie Code: ");
+                int code = readInteger("Introduza o Código do Filme: ");
                 consultMovie(&movieData, code);
                 break;
             }
@@ -95,7 +95,7 @@ int main() {
                 addMovie(&movieData);
                 break;
             case 0: {
-                printf("Are you sure you want to exit? (1: Yes, 0: No): ");
+                printf("Tem a certeza que quer sair? (1: Sim, 0: Não): ");
                 int confirm = readInteger("");
                 if (confirm == 1) {
                 } else {
@@ -104,7 +104,7 @@ int main() {
                 break;
             }
             default:
-                printf("Invalid option.\n");
+                printf("Opção inválida.\n");
         }
     } while (choice != 0);
 
