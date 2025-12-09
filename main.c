@@ -3,6 +3,7 @@
 #include "movie.h"
 #include "utils.h"
 
+// Menu principal que aparece quando o programa inicia
 void printMenu() {
     printf("1. Listar Filmes\n");
     printf("2. Pesquisar Filmes\n");
@@ -11,6 +12,7 @@ void printMenu() {
     printf("0. Sair\n");
 }
 
+// Menu para escolher como queremos ver a lista de filmes
 void printListMenu() {
     printf("1. Por Código (Crescente)\n");
     printf("2. Por Classificação (Decrescente)\n");
@@ -18,6 +20,7 @@ void printListMenu() {
     printf("0. Voltar\n");
 }
 
+// Menu para escolher o tipo de pesquisa
 void printSearchMenu() {
     printf("1. Por Título\n");
     printf("2. Por Género\n");
@@ -31,12 +34,14 @@ int main() {
     initializeMovies(&movieData);
 
     int choice;
+    // Loop principal do programa. Só sai quando o utilizador escolhe 0
     do {
         printMenu();
         choice = readInteger("Selecione uma opção: ");
 
         switch (choice) {
             case 1: {
+                // Sub-menu de listagem
                 int listChoice;
                 do {
                     printListMenu();
@@ -52,6 +57,7 @@ int main() {
                 break;
             }
             case 2: {
+                // Sub-menu de pesquisa
                 int searchChoice;
                 do {
                     printSearchMenu();

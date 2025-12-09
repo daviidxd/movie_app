@@ -11,6 +11,7 @@ const char *GENRE_NAMES[] = {"ACTION",  "ADVENTURE", "ANIMATION", "BIOGRAPHY",
                              "MUSICAL", "MYSTERY",   "ROMANCE",   "SCI-FI",
                              "SPORT",   "THRILLER",  "WAR",       "WESTERN"};
 
+// Converte o enum do género para uma string legível
 const char *getGenreName(Genre g) {
   if (g >= 0 && g < GENRE_COUNT) {
     return GENRE_NAMES[g];
@@ -20,6 +21,7 @@ const char *getGenreName(Genre g) {
 
 void initializeMovies(MovieArray *list) { list->count = 0; }
 
+// Adiciona um novo filme à lista. Pede todos os dados ao utilizador
 int addMovie(MovieArray *list) {
   if (list->count >= MAX_MOVIES) {
     printf("Erro: Capacidade maxima de filmes atingida.\n");
@@ -28,10 +30,12 @@ int addMovie(MovieArray *list) {
 
   Movie *m = &list->movies[list->count];
 
+  // Gera o ID automaticamente: se for o primeiro é 1, senão pega no último e soma 1
   m->code = (list->count == 0) ? 1 : list->movies[list->count - 1].code + 1;
 
   readString("Introduza o Titulo: ", m->title, MAX_STRING);
 
+  // Inicializa o array de géneros a 0 (falso)
   for (int i = 0; i < GENRE_COUNT; i++)
     m->genres[i] = 0;
   printf("Adicionar generos (introduza 0 para parar):\n");
@@ -70,16 +74,19 @@ int addMovie(MovieArray *list) {
   return 1;
 }
 
+// Imprime o cabeçalho da tabela de filmes
 void printTableHeader() {
   printf("%-5s %-30s %-20s %-10s %-10s\n", "Code", "Title", "Director", "Year",
          "Rating");
 }
 
+// Imprime uma linha com os dados de um filme, formatada para ficar alinhada com o cabeçalho
 void printMovieRow(const Movie *m) {
   printf("%-5d %-30.30s %-20.20s %-10d %-10.1f\n", m->code, m->title,
          m->director, m->year, m->rating);
 }
 
+// Lista todos os filmes por ordem de código (ordem de inserção)
 void listMoviesByCode(const MovieArray *list) {
   printTableHeader();
   for (int i = 0; i < list->count; i++) {
@@ -87,6 +94,7 @@ void listMoviesByCode(const MovieArray *list) {
   }
 }
 
+// Função auxiliar para o qsort. Compara dois filmes pela classificação para ordenar do maior para o menor
 int compareRatingDesc(const void *a, const void *b) {
   const Movie *mA = (const Movie *)a;
   const Movie *mB = (const Movie *)b;
@@ -97,6 +105,7 @@ int compareRatingDesc(const void *a, const void *b) {
   return 0;
 }
 
+// Cria uma cópia da lista para não estragar a original e ordena por classificação
 void listMoviesByRating(const MovieArray *list) {
   MovieArray temp = *list;
   qsort(temp.movies, temp.count, sizeof(Movie), compareRatingDesc);
@@ -106,12 +115,14 @@ void listMoviesByRating(const MovieArray *list) {
   }
 }
 
+// Função auxiliar para o qsort. Compara os títulos para ordenar alfabeticamente
 int compareTitleAsc(const void *a, const void *b) {
   const Movie *mA = (const Movie *)a;
   const Movie *mB = (const Movie *)b;
   return strcmp(mA->title, mB->title);
 }
 
+// Cria uma cópia da lista e ordena por título
 void listMoviesByTitle(const MovieArray *list) {
   MovieArray temp = *list;
   qsort(temp.movies, temp.count, sizeof(Movie), compareTitleAsc);
@@ -121,6 +132,7 @@ void listMoviesByTitle(const MovieArray *list) {
   }
 }
 
+// Procura texto ignorando maiúsculas/minúsculas. É preciso fazer isto à mão porque o C padrão não tem esta função
 int strCaseStr(const char *haystack, const char *needle) {
   if (!*needle)
     return 1;
@@ -138,6 +150,7 @@ int strCaseStr(const char *haystack, const char *needle) {
   return 0;
 }
 
+// Pesquisa filmes que tenham o texto no título (parcial)
 void searchMoviesByTitle(const MovieArray *list, const char *search) {
   printTableHeader();
   for (int i = 0; i < list->count; i++) {
@@ -147,6 +160,7 @@ void searchMoviesByTitle(const MovieArray *list, const char *search) {
   }
 }
 
+// Pesquisa filmes que tenham um determinado género
 void searchMoviesByGenre(const MovieArray *list, Genre genre) {
   printTableHeader();
   for (int i = 0; i < list->count; i++) {
@@ -177,6 +191,7 @@ void searchMoviesByActor(const MovieArray *list, const char *actor) {
   }
 }
 
+// Mostra todos os detalhes de um filme específico pelo código
 void consultMovie(const MovieArray *list, int code) {
   for (int i = 0; i < list->count; i++) {
     if (list->movies[i].code == code) {
