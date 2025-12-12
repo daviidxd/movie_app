@@ -30,7 +30,7 @@ void printSearchMenu() {
 }
 
 int main() {
-    MovieArray movieData;
+    static MovieArray movieData;
     initializeMovies(&movieData);
 
     int choice;
