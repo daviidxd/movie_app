@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <locale.h>
 #include "movie.h"
 #include "utils.h"
 
@@ -30,6 +31,7 @@ void printSearchMenu() {
 }
 
 int main() {
+    setlocale(LC_ALL, "pt_PT.UTF-8");
     static MovieArray movieData;
     initializeMovies(&movieData);
 
