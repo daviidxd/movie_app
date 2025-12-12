@@ -5,44 +5,50 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Array constante com os nomes dos géneros para mostrar ao utilizador
 const char *GENRE_NAMES[] = {"ACTION",  "ADVENTURE", "ANIMATION", "BIOGRAPHY",
                              "COMEDY",  "CRIME",     "DRAMA",     "FAMILY",
                              "FANTASY", "HISTORY",   "HORROR",    "MUSIC",
                              "MUSICAL", "MYSTERY",   "ROMANCE",   "SCI-FI",
                              "SPORT",   "THRILLER",  "WAR",       "WESTERN"};
 
-// Converte o enum do género para uma string legível
+// Converte o número do género (enum) para o texto correspondente
 const char *getGenreName(Genre g) {
+  // Verifica se o género é válido antes de aceder ao array
   if (g >= 0 && g < GENRE_COUNT) {
     return GENRE_NAMES[g];
   }
   return "UNKNOWN";
 }
 
+// Inicializa a lista de filmes definindo o contador como 0
 void initializeMovies(MovieArray *list) { list->count = 0; }
 
 // Adiciona um novo filme à lista. Pede todos os dados ao utilizador
 int addMovie(MovieArray *list) {
+  // Verifica se ainda há espaço na lista
   if (list->count >= MAX_MOVIES) {
     printf("Erro: Capacidade maxima de filmes atingida.\n");
     return 0;
   }
 
+  // Aponta para a próxima posição livre no array
   Movie *m = &list->movies[list->count];
 
-  // Gera o ID automaticamente: se for o primeiro é 1, senão pega no último e
-  // soma 1
+  // Gera o ID automaticamente: se for o primeiro é 1, senão pega no último e soma 1
   m->code = (list->count == 0) ? 1 : list->movies[list->count - 1].code + 1;
 
   readString("Introduza o Titulo: ", m->title, MAX_STRING);
 
-  // Inicializa o array de géneros a 0 (falso)
+  // Inicializa todos os géneros como 0 (não selecionado)
   for (int i = 0; i < GENRE_COUNT; i++)
     m->genres[i] = 0;
+    
   printf("Adicionar generos (introduza 0 para parar):\n");
+  // Loop para adicionar múltiplos géneros
   while (1) {
     Genre g = selectGenre();
-    m->genres[g] = 1;
+    m->genres[g] = 1; // Marca o género escolhido como 1 (selecionado)
     printf("Adicionar outro genero? (1: Sim, 0: Nao): ");
     int choice = readIntegerRange("", 0, 1);
     if (choice == 0)
@@ -54,16 +60,19 @@ int addMovie(MovieArray *list) {
 
   m->actorsCount = 0;
   printf("Adicionar atores (introduza nome vazio para parar):\n");
+  // Loop para adicionar atores até ao máximo permitido
   while (m->actorsCount < MAX_ACTORS) {
     char actorName[MAX_STRING];
     printf("Ator %d: ", m->actorsCount + 1);
     readString("", actorName, MAX_STRING);
+    // Se o utilizador der enter sem escrever nada, para de pedir atores
     if (strlen(actorName) == 0)
       break;
     strcpy(m->actors[m->actorsCount], actorName);
     m->actorsCount++;
   }
 
+  // Lê os dados numéricos com validação de intervalo
   m->year = readIntegerRange("Introduza o Ano: ", 1888, 2100);
   m->duration = readIntegerRange("Introduza a Duracao (minutos): ", 1, 1000);
   m->rating = readFloatRange("Introduza a Classificacao (0-10): ", 0.0, 10.0);
@@ -71,6 +80,7 @@ int addMovie(MovieArray *list) {
       readIntegerRange("Introduza o numero de Favoritos: ", 0, 1000000000);
   m->revenue = readFloatRange("Introduza a Receita (milhoes): ", 0.0, 10000.0);
 
+  // Incrementa o contador de filmes na lista
   list->count++;
   printf("Filme adicionado com sucesso com o Codigo: %d\n", m->code);
   return 1;
@@ -97,11 +107,13 @@ void listMoviesByCode(const MovieArray *list) {
   }
 }
 
-// Função auxiliar para o qsort. Compara dois filmes pela classificação para
-// ordenar do maior para o menor
+// Função auxiliar para o qsort. Compara dois filmes pela classificação para ordenar do maior para o menor
 int compareRatingDesc(const void *a, const void *b) {
+  // Faz cast dos ponteiros genéricos (void*) para ponteiros de Movie
   const Movie *mA = (const Movie *)a;
   const Movie *mB = (const Movie *)b;
+  
+  // Retorna positivo se B for maior que A (para ordem decrescente)
   if (mB->rating > mA->rating)
     return 1;
   if (mB->rating < mA->rating)
@@ -109,20 +121,26 @@ int compareRatingDesc(const void *a, const void *b) {
   return 0;
 }
 
-// Cria uma cópia da lista para não estragar a original e ordena por
-// classificação
+// Cria uma cópia da lista para não estragar a original e ordena por classificação
 void listMoviesByRating(const MovieArray *list) {
+  // Aloca memória temporária para a cópia da lista
   MovieArray *temp = malloc(sizeof(MovieArray));
   if (temp == NULL) {
     printf("Erro ao alocar memoria.\n");
     return;
   }
+  // Copia o conteúdo da lista original para a temporária
   *temp = *list;
+  
+  // Usa o qsort (Quick Sort) da biblioteca padrão para ordenar
   qsort(temp->movies, temp->count, sizeof(Movie), compareRatingDesc);
+  
   printTableHeader();
   for (int i = 0; i < temp->count; i++) {
     printMovieRow(&temp->movies[i]);
   }
+  
+  // Liberta a memória alocada
   free(temp);
 }
 
@@ -130,6 +148,7 @@ void listMoviesByRating(const MovieArray *list) {
 int compareTitleAsc(const void *a, const void *b) {
   const Movie *mA = (const Movie *)a;
   const Movie *mB = (const Movie *)b;
+  // strcmp compara duas strings e retorna <0, 0 ou >0
   return strcmp(mA->title, mB->title);
 }
 
@@ -149,23 +168,27 @@ void listMoviesByTitle(const MovieArray *list) {
   free(temp);
 }
 
-// Procura texto ignorando maiúsculas/minúsculas. É preciso fazer isto à mão
-// porque o C padrão não tem esta função
+// Procura texto ignorando maiúsculas/minúsculas. É preciso fazer isto à mão porque o C padrão não tem esta função
 int strCaseStr(const char *haystack, const char *needle) {
   if (!*needle)
-    return 1;
+    return 1; // Se a string de busca for vazia, encontra sempre
+    
+  // Percorre a string principal (haystack)
   for (const char *p = haystack; *p; p++) {
+    // Se encontrar o primeiro caracter igual (ignorando case)
     if (tolower((unsigned char)*p) == tolower((unsigned char)*needle)) {
       const char *h, *n;
+      // Verifica se o resto da palavra também bate certo
       for (h = p, n = needle; *h && *n; h++, n++) {
         if (tolower((unsigned char)*h) != tolower((unsigned char)*n))
           break;
       }
+      // Se chegámos ao fim da string de busca (*n == 0), encontrámos!
       if (!*n)
         return 1;
     }
   }
-  return 0;
+  return 0; // Não encontrou
 }
 
 // Pesquisa filmes que tenham o texto no título (parcial)
@@ -182,6 +205,7 @@ void searchMoviesByTitle(const MovieArray *list, const char *search) {
 void searchMoviesByGenre(const MovieArray *list, Genre genre) {
   printTableHeader();
   for (int i = 0; i < list->count; i++) {
+    // Verifica se o género está marcado como 1 (verdadeiro) neste filme
     if (list->movies[i].genres[genre]) {
       printMovieRow(&list->movies[i]);
     }
@@ -197,10 +221,13 @@ void searchMoviesByDirector(const MovieArray *list, const char *director) {
   }
 }
 
+// Pesquisa filmes por ator
 void searchMoviesByActor(const MovieArray *list, const char *actor) {
   printTableHeader();
   for (int i = 0; i < list->count; i++) {
+    // Percorre todos os atores do filme
     for (int j = 0; j < list->movies[i].actorsCount; j++) {
+      // Se encontrar o ator, mostra o filme e passa para o próximo filme (break)
       if (strCaseStr(list->movies[i].actors[j], actor)) {
         printMovieRow(&list->movies[i]);
         break;

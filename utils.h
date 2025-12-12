@@ -3,6 +3,7 @@
 
 #include "movie.h"
 
+// Funções utilitárias para leitura de dados e validação
 void clearInputBuffer();
 int readInteger(const char *prompt);
 float readFloat(const char *prompt);

@@ -31,47 +31,57 @@ void printSearchMenu() {
 }
 
 int main() {
+    // Define a localização para Português de Portugal para aceitar acentos e caracteres especiais
     setlocale(LC_ALL, "pt_PT.UTF-8");
+    
+    // Cria a estrutura que vai guardar todos os filmes. 'static' faz com que a variável dure o programa todo.
     static MovieArray movieData;
+    
+    // Prepara a lista de filmes (coloca o contador a zero)
     initializeMovies(&movieData);
 
     int choice;
     // Loop principal do programa. Só sai quando o utilizador escolhe 0
     do {
         printMenu();
+        // Lê a escolha do utilizador
         choice = readInteger("Selecione uma opção: ");
 
+        // Verifica qual foi a opção escolhida e executa o código correspondente
         switch (choice) {
             case 1: {
-                // Sub-menu de listagem
+                // Sub-menu de listagem: permite escolher a ordem dos filmes
                 int listChoice;
-                do {
-                    printListMenu();
-                    listChoice = readInteger("Selecione uma opção de listagem: ");
-                    switch (listChoice) {
-                        case 1: listMoviesByCode(&movieData); break;
-                        case 2: listMoviesByRating(&movieData); break;
-                        case 3: listMoviesByTitle(&movieData); break;
-                        case 0: break;
-                        default: printf("Opção inválida.\n");
-                    }
-                } while (listChoice != 0);
+                    // Loop do sub-menu de listagem
+                    do {
+                        printListMenu();
+                        listChoice = readInteger("Selecione uma opção de listagem: ");
+                        switch (listChoice) {
+                            case 1: listMoviesByCode(&movieData); break; // Lista por ordem de criação
+                            case 2: listMoviesByRating(&movieData); break; // Lista por melhor classificação
+                            case 3: listMoviesByTitle(&movieData); break; // Lista por ordem alfabética
+                            case 0: break; // Sai do sub-menu
+                            default: printf("Opção inválida.\n");
+                        }
+                    } while (listChoice != 0);
                 break;
             }
             case 2: {
-                // Sub-menu de pesquisa
+                // Sub-menu de pesquisa: permite procurar filmes por vários critérios
                 int searchChoice;
                 do {
                     printSearchMenu();
                     searchChoice = readInteger("Selecione uma opção de pesquisa: ");
                     switch (searchChoice) {
                         case 1: {
+                            // Pesquisa por título
                             char search[MAX_STRING];
                             readString("Introduza o título para pesquisar: ", search, MAX_STRING);
                             searchMoviesByTitle(&movieData, search);
                             break;
                         }
                         case 2: {
+                            // Pesquisa por género (mostra lista de géneros para escolher)
                             Genre g = selectGenre();
                             searchMoviesByGenre(&movieData, g);
                             break;
@@ -95,18 +105,23 @@ int main() {
                 break;
             }
             case 3: {
+                // Pede o código do filme e mostra todos os detalhes
                 int code = readInteger("Introduza o Código do Filme: ");
                 consultMovie(&movieData, code);
                 break;
             }
             case 4:
+                // Chama a função para adicionar um novo filme
                 addMovie(&movieData);
                 break;
             case 0: {
+                // Confirmação antes de sair do programa
                 printf("Tem a certeza que quer sair? (1: Sim, 0: Não): ");
                 int confirm = readInteger("");
                 if (confirm == 1) {
+                    // Se confirmar, o loop vai terminar porque choice continua a ser 0
                 } else {
+                    // Se não confirmar, muda choice para -1 para o loop continuar
                     choice = -1;
                 }
                 break;
