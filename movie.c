@@ -267,3 +267,295 @@ void consultMovie(const MovieArray *list, int code) {
   }
   printf("Filme com o codigo %d nao encontrado.\n", code);
 }
+
+#include <strings.h>
+
+// Atualiza os dados de um filme existente
+int updateMovie(MovieArray *list, int code) {
+  int index = -1;
+  for (int i = 0; i < list->count; i++) {
+    if (list->movies[i].code == code) {
+      index = i;
+      break;
+    }
+  }
+
+  if (index == -1) {
+    printf("Filme com o codigo %d nao encontrado.\n", code);
+    return 0;
+  }
+
+  Movie *m = &list->movies[index];
+  printf("A editar filme: %s\n", m->title);
+
+  readString("Novo Titulo: ", m->title, MAX_STRING);
+
+  for (int i = 0; i < GENRE_COUNT; i++) m->genres[i] = 0;
+  printf("Novos generos (0 para parar):\n");
+  while (1) {
+    Genre g = selectGenre();
+    m->genres[g] = 1;
+    printf("Adicionar outro? (1: Sim, 0: Nao): ");
+    if (readIntegerRange("", 0, 1) == 0) break;
+  }
+
+  m->year = readIntegerRange("Novo Ano: ", 1888, 2100);
+  m->duration = readIntegerRange("Nova Duracao (min): ", 1, 1000);
+  m->rating = readFloatRange("Nova Classificacao (0-10): ", 0.0, 10.0);
+  m->favorite = readIntegerRange("Novos Favoritos: ", 0, 1000000000);
+  m->revenue = readFloatRange("Nova Receita (milhoes): ", 0.0, 10000.0);
+
+  printf("Filme atualizado com sucesso.\n");
+  return 1;
+}
+
+// Remove um filme da lista
+int deleteMovie(MovieArray *list, int code) {
+  int index = -1;
+  for (int i = 0; i < list->count; i++) {
+    if (list->movies[i].code == code) {
+      index = i;
+      break;
+    }
+  }
+
+  if (index == -1) {
+    printf("Filme com o codigo %d nao encontrado.\n", code);
+    return 0;
+  }
+
+  for (int i = index; i < list->count - 1; i++) {
+    list->movies[i] = list->movies[i + 1];
+  }
+  
+  list->count--;
+  printf("Filme removido com sucesso.\n");
+  return 1;
+}
+
+// Apaga todos os filmes da memória
+void clearMovies(MovieArray *list) {
+  list->count = 0;
+}
+
+// Helper para ler campo CSV
+char *getCSVField(char **linePtr) {
+    char *start = *linePtr;
+    if (*start == '\0' || *start == '\n' || *start == '\r') return NULL;
+
+    char *end;
+    if (*start == '"') {
+        start++; 
+        end = start;
+        while (*end) {
+            if (*end == '"') {
+                if (*(end + 1) == '"') {
+                    end++; 
+                } else {
+                    break; 
+                }
+            }
+            end++;
+        }
+        *end = '\0'; 
+        *linePtr = end + 1;
+        if (**linePtr == ';') (*linePtr)++; 
+    } else {
+        end = strchr(start, ';');
+        if (end) {
+            *end = '\0';
+            *linePtr = end + 1;
+        } else {
+            *linePtr = start + strlen(start);
+            // Remove newline if present at the very end of the line
+            char *nl = strchr(start, '\n');
+            if(nl) *nl = '\0';
+            nl = strchr(start, '\r');
+            if(nl) *nl = '\0';
+        }
+    }
+    return start;
+}
+
+// Helper para converter float com virgula
+float parseFloatFromCSV(char *str) {
+    if(!str) return 0.0;
+    char temp[50];
+    strncpy(temp, str, 49);
+    for(int i=0; temp[i]; i++) {
+        if(temp[i] == ',') temp[i] = '.';
+    }
+    return atof(temp);
+}
+
+int importMovies(MovieArray *list, const char *filename) {
+    FILE *f = fopen(filename, "r");
+    if (!f) {
+        printf("Erro ao abrir o ficheiro %s\n", filename);
+        return -1;
+    }
+
+    char line[4096]; 
+    int imported = 0;
+
+    // Ignora o cabeçalho
+    fgets(line, sizeof(line), f);
+
+    while (fgets(line, sizeof(line), f) && list->count < MAX_MOVIES) {
+        char *ptr = line;
+        
+        // Code
+        char *token = getCSVField(&ptr);
+        if(!token) continue;
+        int code = atoi(token);
+        
+        // Verifica se o código já existe para não duplicar
+        int exists = 0;
+        for(int i=0; i<list->count; i++) {
+            if(list->movies[i].code == code) {
+                exists = 1;
+                break;
+            }
+        }
+        if(exists) continue;
+
+        Movie *m = &list->movies[list->count];
+        m->code = code;
+
+        // Title
+        token = getCSVField(&ptr);
+        if(token) strncpy(m->title, token, MAX_STRING);
+
+        // Genres
+        token = getCSVField(&ptr);
+        for(int i=0; i<GENRE_COUNT; i++) m->genres[i] = 0;
+        if(token) {
+            char *gPtr = token;
+            char *gToken;
+            while((gToken = strsep(&gPtr, ",")) != NULL) {
+                while(*gToken == ' ') gToken++;
+                for(int i=0; i<GENRE_COUNT; i++) {
+                    if(strcasecmp(GENRE_NAMES[i], gToken) == 0) {
+                        m->genres[i] = 1;
+                    }
+                }
+            }
+        }
+
+        // Description
+        token = getCSVField(&ptr);
+        if(token) strncpy(m->description, token, MAX_DESCRIPTION);
+
+        // Director
+        token = getCSVField(&ptr);
+        if(token) strncpy(m->director, token, MAX_STRING);
+
+        // Actors
+        token = getCSVField(&ptr);
+        m->actorsCount = 0;
+        if(token) {
+            char *aPtr = token;
+            char *aToken;
+            while((aToken = strsep(&aPtr, ",")) != NULL && m->actorsCount < MAX_ACTORS) {
+                while(*aToken == ' ') aToken++;
+                strncpy(m->actors[m->actorsCount], aToken, MAX_STRING);
+                m->actorsCount++;
+            }
+        }
+
+        // Year
+        token = getCSVField(&ptr);
+        if(token) m->year = atoi(token);
+
+        // Duration
+        token = getCSVField(&ptr);
+        if(token) m->duration = atoi(token);
+
+        // Rating
+        token = getCSVField(&ptr);
+        if(token) m->rating = parseFloatFromCSV(token);
+
+        // Favorite
+        token = getCSVField(&ptr);
+        if(token) m->favorite = atoi(token);
+
+        // Revenue
+        token = getCSVField(&ptr);
+        if(token) m->revenue = parseFloatFromCSV(token);
+
+        list->count++;
+        imported++;
+    }
+    fclose(f);
+    return imported;
+}
+
+int exportMovies(const MovieArray *list, const char *filename) {
+    // Verifica se o ficheiro já existe
+    FILE *fCheck = fopen(filename, "r");
+    if (fCheck) {
+        fclose(fCheck);
+        printf("Erro: O ficheiro %s ja existe.\n", filename);
+        return 0;
+    }
+
+    FILE *f = fopen(filename, "w");
+    if (!f) {
+        printf("Erro ao criar o ficheiro %s\n", filename);
+        return 0;
+    }
+
+    // Escreve o cabeçalho
+    fprintf(f, "code;title;genres;description;director;actors;year;duration;rating;favorite ;revenue\n");
+
+    for (int i = 0; i < list->count; i++) {
+        Movie m = list->movies[i];
+        fprintf(f, "%d;%s;", m.code, m.title);
+
+        // Genres
+        int first = 1;
+        for(int g=0; g<GENRE_COUNT; g++) {
+            if(m.genres[g]) {
+                if(!first) fprintf(f, ", ");
+                fprintf(f, "%s", getGenreName((Genre)g));
+                first = 0;
+            }
+        }
+        fprintf(f, ";");
+
+        // Description (com aspas)
+        fprintf(f, "\"%s\";", m.description);
+
+        // Director
+        fprintf(f, "%s;", m.director);
+
+        // Actors
+        first = 1;
+        for(int a=0; a<m.actorsCount; a++) {
+            if(!first) fprintf(f, ", ");
+            fprintf(f, "%s", m.actors[a]);
+            first = 0;
+        }
+        fprintf(f, ";");
+
+        // Year, Duration
+        fprintf(f, "%d;%d;", m.year, m.duration);
+
+        // Rating (com virgula)
+        char buffer[50];
+        sprintf(buffer, "%.1f", m.rating);
+        for(int k=0; buffer[k]; k++) if(buffer[k] == '.') buffer[k] = ',';
+        fprintf(f, "%s;", buffer);
+
+        // Favorite
+        fprintf(f, "%d;", m.favorite);
+
+        // Revenue (com virgula)
+        sprintf(buffer, "%.2f", m.revenue);
+        for(int k=0; buffer[k]; k++) if(buffer[k] == '.') buffer[k] = ',';
+        fprintf(f, "%s\n", buffer);
+    }
+
+    fclose(f);
+    return 1;
+}

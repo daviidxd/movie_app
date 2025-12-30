@@ -65,6 +65,11 @@ void searchMoviesByGenre(const MovieArray *list, Genre genre);
 void searchMoviesByDirector(const MovieArray *list, const char *director);
 void searchMoviesByActor(const MovieArray *list, const char *actor);
 void consultMovie(const MovieArray *list, int code);
+int updateMovie(MovieArray *list, int code);
+int deleteMovie(MovieArray *list, int code);
+void clearMovies(MovieArray *list);
+int importMovies(MovieArray *list, const char *filename);
+int exportMovies(const MovieArray *list, const char *filename);
 const char *getGenreName(Genre g);
 
 #endif

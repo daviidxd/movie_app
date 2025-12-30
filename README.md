@@ -53,6 +53,11 @@ O Menu deve disponibilizar opções para:
     * Mostrar todos os filmes com o ator introduzido
 3. Consultar informação de um filme (fornecer code)
 4. Adicionar filme (o code deve ser único e atribuído automaticamente, os restantes detalhes são fornecidos pelo utilizador)
+5. Alterar informação de um filme (fornecer code e permitir editar title, genres, year, duration, rating, favorite e revenue - só podem ser aceites dados válidos!)
+6. Eliminar filme (fornecer code)
+7. Limpar todos os filmes em memória (solicita confirmação, limpa e apresenta mensagem de sucesso)
+8. Importar filmes de ficheiro .csv (solicita nome do ficheiro, no final da importação informa quantos filmes foram importados)
+9. Exportar filmes para ficheiro .csv (solicita nome do ficheiro e exporta a informação dos filmes atualmente em memória para ficheiro, em formato CSV. Não deve permitir a exportação se já existir um ficheiro com esse nome.
 0. Sair da aplicação (solicita confirmação)
 
 ### Notas

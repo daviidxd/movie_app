@@ -10,6 +10,11 @@ void printMenu() {
     printf("2. Pesquisar Filmes\n");
     printf("3. Consultar Detalhes do Filme\n");
     printf("4. Adicionar Filme\n");
+    printf("5. Alterar Filme\n");
+    printf("6. Eliminar Filme\n");
+    printf("7. Limpar Filmes\n");
+    printf("8. Importar Filmes (CSV)\n");
+    printf("9. Exportar Filmes (CSV)\n");
     printf("0. Sair\n");
 }
 
@@ -114,6 +119,42 @@ int main() {
                 // Chama a função para adicionar um novo filme
                 addMovie(&movieData);
                 break;
+            case 5: {
+                int code = readInteger("Introduza o Código do Filme a alterar: ");
+                updateMovie(&movieData, code);
+                break;
+            }
+            case 6: {
+                int code = readInteger("Introduza o Código do Filme a eliminar: ");
+                deleteMovie(&movieData, code);
+                break;
+            }
+            case 7: {
+                printf("Tem a certeza que quer apagar TODOS os filmes? (1: Sim, 0: Não): ");
+                int confirm = readInteger("");
+                if (confirm == 1) {
+                    clearMovies(&movieData);
+                    printf("Todos os filmes foram apagados.\n");
+                }
+                break;
+            }
+            case 8: {
+                char filename[MAX_STRING];
+                readString("Introduza o nome do ficheiro CSV para importar: ", filename, MAX_STRING);
+                int count = importMovies(&movieData, filename);
+                if (count >= 0) {
+                    printf("%d filmes importados com sucesso.\n", count);
+                }
+                break;
+            }
+            case 9: {
+                char filename[MAX_STRING];
+                readString("Introduza o nome do ficheiro CSV para exportar: ", filename, MAX_STRING);
+                if (exportMovies(&movieData, filename)) {
+                    printf("Filmes exportados com sucesso.\n");
+                }
+                break;
+            }
             case 0: {
                 // Confirmação antes de sair do programa
                 printf("Tem a certeza que quer sair? (1: Sim, 0: Não): ");
